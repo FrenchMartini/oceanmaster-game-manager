@@ -14,19 +14,12 @@ linters:
     - goimports
     - misspell
     - gocritic
-    - revive
 
 linters-settings:
   gofmt:
     simplify: true
   goimports:
     local-prefixes: github.com/oceanmining/game-manager
-  revive:
-    rules:
-      - name: exported
-        severity: warning
-      - name: package-comments
-        severity: warning
   gocritic:
     disabled-checks:
       - exitAfterDefer

@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-// RunMigrations creates all necessary database tables
 func RunMigrations(db *sql.DB) error {
 	migrations := []string{
 		createUsersTable,

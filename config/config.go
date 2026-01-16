@@ -1,4 +1,3 @@
-// Package config provides configuration management for the application.
 package config
 
 import (
@@ -9,7 +8,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Config holds all application configuration
 type Config struct {
 	Port     string
 	Env      string
@@ -20,7 +18,6 @@ type Config struct {
 	Google   GoogleOAuthConfig
 }
 
-// DatabaseConfig holds database configuration
 type DatabaseConfig struct {
 	Host     string
 	Port     string
@@ -30,7 +27,6 @@ type DatabaseConfig struct {
 	SSLMode  string
 }
 
-// RedisConfig holds Redis configuration
 type RedisConfig struct {
 	Host     string
 	Port     string
@@ -38,7 +34,6 @@ type RedisConfig struct {
 	DB       int
 }
 
-// RabbitMQConfig holds RabbitMQ configuration
 type RabbitMQConfig struct {
 	Host     string
 	Port     string
@@ -47,22 +42,18 @@ type RabbitMQConfig struct {
 	Queue    string
 }
 
-// JWTConfig holds JWT configuration
 type JWTConfig struct {
 	Secret      string
 	ExpiryHours time.Duration
 }
 
-// GoogleOAuthConfig holds Google OAuth configuration
 type GoogleOAuthConfig struct {
 	ClientID     string
 	ClientSecret string
 	RedirectURL  string
 }
 
-// Load loads configuration from environment variables
 func Load() (*Config, error) {
-	// Try to load .env file, but don't fail if it doesn't exist
 	_ = godotenv.Load()
 
 	port := getEnv("PORT", "8080")
@@ -95,7 +86,7 @@ func Load() (*Config, error) {
 
 	expiryHours, _ := strconv.Atoi(getEnv("JWT_EXPIRY_HOURS", "24"))
 	jwtConfig := JWTConfig{
-		Secret:      getEnv("JWT_SECRET", "your-secret-key-change-in-production-min-32-chars"),
+		Secret:      getEnv("JWT_SECRET", "supersecretkey"),
 		ExpiryHours: time.Duration(expiryHours) * time.Hour,
 	}
 

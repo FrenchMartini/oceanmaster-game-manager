@@ -7,15 +7,12 @@ import (
 	"net/http"
 )
 
-// HealthHandler handles health check endpoints
 type HealthHandler struct{}
 
-// NewHealthHandler creates a new health handler
 func NewHealthHandler() *HealthHandler {
 	return &HealthHandler{}
 }
 
-// Health returns the health status of the service
 func (h *HealthHandler) Health(w http.ResponseWriter, r *http.Request) {
 	response := map[string]string{
 		"status":  "healthy",

@@ -1,4 +1,3 @@
-// Package middleware provides HTTP middleware utilities.
 package middleware
 
 import (
@@ -11,13 +10,10 @@ import (
 
 type contextKey string
 
-// UserIDKey is the context key for storing user IDs.
 const UserIDKey contextKey = "user_id"
 
-// EmailKey is the context key for storing email addresses.
 const EmailKey contextKey = "email"
 
-// AuthMiddleware validates JWT tokens and sets user context
 func AuthMiddleware(jwtService *auth.JWTService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

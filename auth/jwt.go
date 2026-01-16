@@ -1,4 +1,3 @@
-// Package auth provides JWT authentication functionality.
 package auth
 
 import (
@@ -12,19 +11,15 @@ import (
 )
 
 var (
-	// ErrInvalidToken is returned when a token is invalid.
 	ErrInvalidToken = errors.New("invalid token")
-	// ErrExpiredToken is returned when a token has expired.
 	ErrExpiredToken = errors.New("token has expired")
 )
 
-// JWTService handles JWT operations
 type JWTService struct {
 	secret     string
 	expiryTime time.Duration
 }
 
-// Claims represents JWT claims
 type Claims struct {
 	UserID int64  `json:"user_id"`
 	Email  string `json:"email"`
@@ -77,7 +72,6 @@ func (s *JWTService) ValidateToken(tokenString string) (*Claims, error) {
 	return claims, nil
 }
 
-// GenerateStateToken generates a random state token for OAuth CSRF protection
 func GenerateStateToken() string {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {

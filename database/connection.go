@@ -1,4 +1,3 @@
-// Package database provides database connection and migration functionality.
 package database
 
 import (
@@ -8,7 +7,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Config holds database configuration
 type Config struct {
 	Host     string
 	Port     string
@@ -18,7 +16,6 @@ type Config struct {
 	SSLMode  string
 }
 
-// NewConnection creates a new database connection
 func NewConnection(cfg Config) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",

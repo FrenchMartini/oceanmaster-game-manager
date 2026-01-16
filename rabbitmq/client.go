@@ -1,4 +1,3 @@
-// Package rabbitmq provides RabbitMQ client functionality.
 package rabbitmq
 
 import (
@@ -10,14 +9,12 @@ import (
 	"github.com/oceanmining/game-manager/config"
 )
 
-// Client wraps RabbitMQ connection and channel
 type Client struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
 	queue   string
 }
 
-// NewClient creates a new RabbitMQ client
 func NewClient(cfg config.RabbitMQConfig) (*Client, error) {
 	dsn := fmt.Sprintf("amqp://%s:%s@%s:%s/",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port)
@@ -35,7 +32,6 @@ func NewClient(cfg config.RabbitMQConfig) (*Client, error) {
 		return nil, fmt.Errorf("failed to open channel: %w", err)
 	}
 
-	// Declare queue
 	_, err = channel.QueueDeclare(
 		cfg.Queue, // name
 		true,      // durable
@@ -63,7 +59,6 @@ func NewClient(cfg config.RabbitMQConfig) (*Client, error) {
 	}, nil
 }
 
-// PublishMatchRequest publishes a match request message to the queue
 func (c *Client) PublishMatchRequest(payload []byte) error {
 	err := c.channel.Publish(
 		"",      // exchange
@@ -83,7 +78,6 @@ func (c *Client) PublishMatchRequest(payload []byte) error {
 	return nil
 }
 
-// Close closes the RabbitMQ connection
 func (c *Client) Close() error {
 	if c.channel != nil {
 		if err := c.channel.Close(); err != nil {

@@ -1,4 +1,3 @@
-// Package handlers provides HTTP request handlers.
 package handlers
 
 import (
@@ -20,20 +19,16 @@ import (
 )
 
 var (
-	// ErrUserNotFound is returned when a user cannot be found.
 	ErrUserNotFound = errors.New("user not found")
-	// ErrUserExists is returned when a user already exists.
-	ErrUserExists = errors.New("user already exists")
+	ErrUserExists   = errors.New("user already exists")
 )
 
-// AuthHandler handles authentication endpoints
 type AuthHandler struct {
 	db          *sql.DB
 	jwtService  *auth.JWTService
 	oauthConfig *oauth2.Config
 }
 
-// NewAuthHandler creates a new auth handler
 func NewAuthHandler(db *sql.DB, jwtService *auth.JWTService, googleConfig config.GoogleOAuthConfig) *AuthHandler {
 	oauthConfig := &oauth2.Config{
 		ClientID:     googleConfig.ClientID,
@@ -53,24 +48,21 @@ func NewAuthHandler(db *sql.DB, jwtService *auth.JWTService, googleConfig config
 	}
 }
 
-// GoogleLogin initiates Google OAuth flow
 func (h *AuthHandler) GoogleLogin(w http.ResponseWriter, r *http.Request) {
 	if h.oauthConfig.ClientID == "" || h.oauthConfig.ClientSecret == "" {
 		http.Error(w, "Google OAuth not configured", http.StatusInternalServerError)
 		return
 	}
 
-	// Generate state token for CSRF protection
 	state := auth.GenerateStateToken()
 
-	// Store state in session/cookie (simplified - in production use secure cookies)
 	http.SetCookie(w, &http.Cookie{
 		Name:     "oauth_state",
 		Value:    state,
 		HttpOnly: true,
 		Secure:   os.Getenv("ENV") == "production",
 		SameSite: http.SameSiteLaxMode,
-		MaxAge:   600, // 10 minutes
+		MaxAge:   600,
 	})
 
 	url := h.oauthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
@@ -79,7 +71,6 @@ func (h *AuthHandler) GoogleLogin(w http.ResponseWriter, r *http.Request) {
 
 // GoogleCallback handles Google OAuth callback
 func (h *AuthHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
-	// Verify state token
 	cookie, err := r.Cookie("oauth_state")
 	if err != nil || cookie.Value != r.URL.Query().Get("state") {
 		http.Error(w, "Invalid state parameter", http.StatusBadRequest)
@@ -92,14 +83,12 @@ func (h *AuthHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Exchange code for token
 	token, err := h.oauthConfig.Exchange(context.Background(), code)
 	if err != nil {
 		http.Error(w, "Failed to exchange token: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Get user info from Google
 	client := h.oauthConfig.Client(context.Background(), token)
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
@@ -130,21 +119,18 @@ func (h *AuthHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Find or create user
 	user, err := h.findOrCreateUser(googleUser.ID, googleUser.Email, googleUser.Name, googleUser.Picture)
 	if err != nil {
 		http.Error(w, "Failed to create/find user: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Generate JWT token
 	jwtToken, err := h.jwtService.GenerateToken(user.ID, user.Email)
 	if err != nil {
 		http.Error(w, "Failed to generate token: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Return token and user info
 	response := models.LoginResponse{
 		Token: jwtToken,
 		User:  *user,
@@ -156,11 +142,9 @@ func (h *AuthHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// findOrCreateUser finds an existing user or creates a new one
 func (h *AuthHandler) findOrCreateUser(googleID, email, name, picture string) (*models.User, error) {
 	var user models.User
 
-	// Try to find existing user by Google ID
 	query := `SELECT id, email, google_id, name, picture, created_at FROM users WHERE google_id = $1`
 	err := h.db.QueryRow(query, googleID).Scan(
 		&user.ID,
@@ -172,7 +156,6 @@ func (h *AuthHandler) findOrCreateUser(googleID, email, name, picture string) (*
 	)
 
 	if err == nil {
-		// User exists, return it
 		return &user, nil
 	}
 
@@ -180,7 +163,6 @@ func (h *AuthHandler) findOrCreateUser(googleID, email, name, picture string) (*
 		return nil, fmt.Errorf("database error: %w", err)
 	}
 
-	// User doesn't exist, create new one
 	query = `INSERT INTO users (email, google_id, name, picture) VALUES ($1, $2, $3, $4) RETURNING id, email, google_id, name, picture, created_at`
 	err = h.db.QueryRow(query, email, googleID, name, picture).Scan(
 		&user.ID,
@@ -192,9 +174,7 @@ func (h *AuthHandler) findOrCreateUser(googleID, email, name, picture string) (*
 	)
 
 	if err != nil {
-		// Check if it's a duplicate email error
 		if err.Error() == "pq: duplicate key value violates unique constraint \"users_email_key\"" {
-			// Try to find by email instead
 			query = `SELECT id, email, google_id, name, picture, created_at FROM users WHERE email = $1`
 			err = h.db.QueryRow(query, email).Scan(
 				&user.ID,

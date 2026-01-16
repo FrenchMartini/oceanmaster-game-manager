@@ -66,12 +66,8 @@ A pre-commit hook automatically runs on every commit:
 - `gofmt -s -w` - Auto-formats all Go code
 - `golangci-lint run` - Lints all Go code
 
-**⚠️ Commits will be blocked if linting fails.** Fix any linting errors before committing.
+** Commits will be blocked if linting fails.** Fix any linting errors before committing.
 
-To manually run linting:
-```bash
-golangci-lint run ./... --deadline=5m
-```
 
 ### Manual Testing
 
