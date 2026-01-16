@@ -69,12 +69,6 @@ A pre-commit hook automatically runs on every commit:
 ** Commits will be blocked if linting fails.** Fix any linting errors before committing.
 
 
-### Manual Testing
-
-```bash
-# Run tests
-./scripts/test.sh
-```
 
 ## Environment Variables
 

@@ -1,37 +1,29 @@
 .PHONY: help install build run test lint docker-up docker-down docker-logs clean
 
-help: ## Show this help message
-	@echo 'Usage: make [target]'
-	@echo ''
-	@echo 'Available targets:'
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
-
-install: ## Install dependencies and setup Husky
+install:
 	npm install
 	npx husky install
 	go mod download
 
-build: ## Build the application
+build: 
 	go build -o bin/game-manager ./cmd/server
 
-run: ## Run the application locally
+run: 
 	go run cmd/server/main.go
 
-test: ## Run tests
+test: 
 	go test ./...
 
-lint: ## Run linter
+lint:
 	./scripts/lint.sh
 
-docker-up: ## Start all services with Docker Compose
+docker-up: 
 	docker-compose up --build
 
-docker-down: ## Stop all services
+docker-down:
 	docker-compose down
 
-docker-logs: ## View Docker Compose logs
-	docker-compose logs -f
 
-clean: ## Clean build artifacts
+clean: 
 	rm -rf bin/
 	go clean
