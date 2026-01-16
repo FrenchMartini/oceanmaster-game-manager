@@ -1,0 +1,6 @@
+{
+  "name": "game-manager",
+  "version": "1.0.0",
+  "description": "Game Manager Backend Service - Tooling configuration",
+  "private": true
+}

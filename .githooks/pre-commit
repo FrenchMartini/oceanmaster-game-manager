@@ -1,0 +1,12 @@
+#!/bin/bash
+# Simple pre-commit hook for Go linting
+
+set -e
+
+echo "Running go fmt..."
+go fmt ./...
+
+echo "Running golangci-lint..."
+golangci-lint run ./...
+
+echo "✓ Pre-commit checks passed"
